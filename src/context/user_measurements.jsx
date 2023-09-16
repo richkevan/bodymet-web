@@ -31,6 +31,10 @@ const UserMeasurementsProvider = ({children}) => {
   }
 
   useEffect(() => {
+      console.log("USER: ", user)
+      if (!user) return
+      if (bloodPressure.length > 0 || heartRate.length > 0 || weight.length > 0) return
+      console.log("USER EXISTS AND METRIC LENGTH IS 0")
       getBPMMeasure(user?.uid)
       .then((response) => {
         response.sort((a,b) => a.date - b.date)
@@ -66,7 +70,7 @@ const UserMeasurementsProvider = ({children}) => {
       .then((response) => {
         setTemperature(response)
       })
-  }, [])
+  }, [user, window.location.pathname])
 
   return (
     <userMeasurements.Provider value={{bloodPressure, weight, temperature, heartRate, activities, workouts}}>

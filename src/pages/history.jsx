@@ -24,10 +24,11 @@ const History = () => {
     console.log("temperature: ", temperature)
     switch (type) {
       case "bloodpressure":
+        setData(bloodPressure)
+        break;
       case "heartrate":
-        
-          setData(bloodPressure)
-        break
+        setData(heartRate)
+        break;
       case "weight":
         setData(weight)
         break;
@@ -41,19 +42,53 @@ const History = () => {
     }
   }, [bloodPressure, heartRate, weight, temperature])
 
+  const avgHR = (data) => {
+    let sum = 0
+    data.forEach((doc) => {
+      sum += doc.hr
+    })
+    return sum / data.length
+  }
+
+  const avgDiastolic = (data) => {
+    let sum = 0
+    data.forEach((doc) => {
+      sum += doc.diastolic
+    })
+    return sum / data.length
+  }
+
+  const avgSystolic = (data) => {
+    let sum = 0
+    data.forEach((doc) => {
+      sum += doc.systolic
+    })
+    return sum / data.length
+  }
+
+  const avgWeight = (data) => {
+    let sum = 0
+    data.forEach((doc) => {
+      sum += parseFloat(doc[1])
+    })
+    return sum / data.length
+  }
+
   return (
     <>
       <p>History</p>
-    {
-      data ? 
-      <div className="flex flex-col gap-2">
+      {type === "bloodpressure"  && <p>Average BP: {`${Math.round(avgSystolic(data))}/${Math.round(avgDiastolic(data))}`}</p>}
+      {type === "heartrate" && <p>Average HR: {Math.round(avgHR(data))}</p>}
+      {type === "weight" && <p>Average Weight: {avgWeight(data).toFixed(2)} kgs</p>}
+      <div className="flex flex-col gap-2 overflow-y-scroll">
       {data.map((doc) => {
       return (
         <Card>
         <Text>{new Date(doc.date * 1000).toUTCString()}</Text>
         <div className="flex flex-row gap-4">
-        {(type === "bloodpressure" || type === "heartrate") && <Hearthistory doc={doc} />}
+        {(type === "bloodpressure") && <Hearthistory doc={doc} />}
         {type === "weight" && <WeightHistory doc={doc} />}
+        {type === "heartrate" && <Metric>{doc.hr} BPM</Metric>}
         </div>
         </Card>
       )
